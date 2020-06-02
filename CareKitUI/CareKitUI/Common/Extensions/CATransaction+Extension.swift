@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2019, Apple Inc. All rights reserved.
+ Copyright (c) 2020, Apple Inc. All rights reserved.
  
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
@@ -29,19 +29,15 @@
  */
 
 import Foundation
+import UIKit
 
-public struct OCKLocalVersionID: Equatable, Comparable, Hashable, Codable, CustomStringConvertible {
-    public static func < (lhs: OCKLocalVersionID, rhs: OCKLocalVersionID) -> Bool {
-        return lhs.stringValue < rhs.stringValue
-    }
+extension CATransaction {
 
-    public var description: String {
-        return stringValue
-    }
-
-    public let stringValue: String
-
-    public init(_ id: String) {
-        self.stringValue = id
+    /// Modify a property on a CALayer without the implicit animation.
+    static func performWithoutAnimations(_ block: () -> Void) {
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        block()
+        CATransaction.commit()
     }
 }

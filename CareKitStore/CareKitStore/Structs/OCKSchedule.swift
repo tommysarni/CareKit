@@ -45,13 +45,13 @@ public struct OCKSchedule: Codable, Equatable {
     /// Create a new schedule by combining an array of other `OCKSchedule` objects.
     public init(composing schedules: [OCKSchedule]) {
         assert(!schedules.isEmpty, "You cannot create a schedule with 0 elements")
-        self.elements = schedules.flatMap { $0.elements }
+        self.elements = schedules.flatMap { $0.elements }.sorted(by: { $0.start < $1.start })
     }
 
     /// Create a new schedule by combining an array of other `OCKSchedule` objects.
     public init(composing elements: [OCKScheduleElement]) {
         assert(!elements.isEmpty, "You cannot create a schedule with 0 elements")
-        self.elements = elements.flatMap { $0.elements }
+        self.elements = elements.flatMap { $0.elements }.sorted(by: { $0.start < $1.start })
     }
 
     /// Returns the Nth event of this schedule.
@@ -125,8 +125,8 @@ public struct OCKSchedule: Codable, Equatable {
     public static func weeklyAtTime(weekday: Int, hours: Int, minutes: Int, start: Date, end: Date?, targetValues: [OCKOutcomeValue],
                                     text: String?, duration: OCKScheduleElement.Duration = .hours(1)) -> OCKSchedule {
         let interval = DateComponents(weekOfYear: 1)
-        var startTime = Calendar.current.date(bySettingHour: hours, minute: minutes, second: 0, of: start)!
-        startTime = Calendar.current.date(bySetting: .weekday, value: weekday, of: startTime)!
+        var startTime = Calendar.current.date(bySetting: .weekday, value: weekday, of: start)!
+        startTime = Calendar.current.date(bySettingHour: hours, minute: minutes, second: 0, of: startTime)!
         let element = OCKScheduleElement(start: startTime, end: end, interval: interval,
                                          text: text, targetValues: targetValues, duration: duration)
         return OCKSchedule(composing: [element])

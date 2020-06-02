@@ -29,6 +29,7 @@
  */
 
 import Foundation
+import SwiftUI
 
 /// Defines styling constants.
 public protocol OCKStyler {
@@ -46,7 +47,29 @@ public extension OCKStyler {
     var dimension: OCKDimensionStyler { OCKDimensionStyle() }
 }
 
-// Concrete object that contains style constants
+// Concrete object that contains style constants.
 public struct OCKStyle: OCKStyler {
     public init() {}
+}
+
+private struct StyleEnvironmentKey: EnvironmentKey {
+    static var defaultValue: OCKStyler = OCKStyle()
+}
+
+public extension EnvironmentValues {
+
+    /// Style constants that can be used by a view.
+    var careKitStyle: OCKStyler {
+        get { self[StyleEnvironmentKey.self] }
+        set { self[StyleEnvironmentKey.self] = newValue }
+    }
+}
+
+public extension View {
+
+    /// Provide style constants that can be used by a view.
+    /// - Parameter style: Style constants that can be used by a view.
+    func careKitStyle(_ style: OCKStyler) -> some View {
+        return self.environment(\.careKitStyle, style)
+    }
 }

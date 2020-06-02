@@ -104,9 +104,9 @@ UIViewController, OCKTaskViewDelegate {
         viewModelSubscription?.cancel()
         viewModelSubscription = controller.objectWillChange
             .context()
-            .sink { [view] context in
-                guard let typedView = view as? ViewSynchronizer.View else { fatalError("View should be of type \(ViewSynchronizer.View.self)") }
-                self.viewSynchronizer.updateView(typedView, context: context)
+            .sink { [weak self] context in
+                guard let typedView = self?.view as? ViewSynchronizer.View else { fatalError("View should be of type \(ViewSynchronizer.View.self)") }
+                self?.viewSynchronizer.updateView(typedView, context: context)
             }
     }
 
@@ -134,6 +134,11 @@ UIViewController, OCKTaskViewDelegate {
         do {
             let alert = try controller.initiateDeletionForOutcomeValue(atIndex: index, eventIndexPath: eventIndexPath,
                                                                        deletionCompletion: notifyDelegateAndResetViewOnError)
+            if let anchor = sender as? UIView {
+                alert.popoverPresentationController?.sourceRect = anchor.bounds
+                alert.popoverPresentationController?.sourceView = anchor
+                alert.popoverPresentationController?.permittedArrowDirections = .any
+            }
             present(alert, animated: true, completion: nil)
         } catch {
             delegate?.taskViewController(self, didEncounterError: error)
